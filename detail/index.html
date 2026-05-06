@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Info</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://googleads.g.doubleclick.net">
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net">
+  <style>
+    *,box-sizing:border-box{box-sizing:border-box}
+    html,body{font-family:Arial,sans-serif;background:#5BA3F1;font-size:4vw;margin:0;padding:0}
+    .play-section{height:0;overflow:hidden;transition:height .3s}
+    .play-section iframe{width:100%;height:100%;border:none;display:block}
+    .top-section{display:flex;background:#124f8f;color:#fff;padding:16px 0;max-width:480px;margin:0 auto;border-radius:12px}
+    .top-icon{flex:0 0 40%;max-width:80px;padding-left:2vw;box-sizing:border-box}
+    .top-icon img{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:8px;display:block}
+    .game-info{flex:0 0 60%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding-left:20px}
+    .top-name{margin:0 0 1.5vw 0;font-size:16px;line-height:1.2;word-break:break-word;max-width:280px}
+    .play-button{width:80%;max-width:200px;height:8vw;max-height:36px;border:2px solid #fff;border-radius:8px;overflow:hidden;background:#e5e5e5;margin:0 auto;cursor:default}
+    .play-progress{height:100%;width:0;background:#10b981;display:flex;align-items:center;justify-content:center;transition:width 5s linear;color:#fff;font-weight:bold;font-size:16px}
+    .ad-section{max-width:480px;margin:0 auto;padding:0 16px;box-sizing:border-box}
+    .tips-section{background:#124f8f;color:#fff;padding:16px;max-width:480px;margin:8px auto 16px;border-radius:12px}
+    .tips-title{font-size:18px;font-weight:bold;margin-bottom:8px}
+    hr{border:none;height:1px;background:#fff;margin:10px 0 4px}
+    .tips-list{list-style:none;padding:0;margin:0}
+    .tips-list li{font-size:12px;line-height:1.2;margin:0;padding:0}
+    .tips-list li strong{color:#F28484}
+  </style>
+</head>
+<body>
+  <div id="play-section" class="play-section">
+    <iframe id="play-frame" allow="autoplay"></iframe>
+  </div>
+
+  <div class="top-section">
+    <div class="top-icon">
+      <img id="game-icon" src="" />
+    </div>
+    <div class="game-info">
+      <h1 id="game-name" class="top-name">Game Name</h1>
+      <div class="play-button" id="play-btn">
+        <div class="play-progress" id="play-progress">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-section" id="ad-detail"></div>
+
+  <div class="tips-section">
+    <div class="tips-title">Game Tips</div>
+    <hr />
+    <ul class="tips-list">
+      <li><strong>1. Keep Moving:</strong> Gain resources, defeat enemies, complete levels. Persistence wins!</li>
+      <li><strong>2. Play Free:</strong> Start the game, have fun, and enjoy your time!</li>
+    </ul>
+  </div>
+
+  <script src="../config.js"></script>
+  <script src="script.js"></script>
+  <script>
+  (function() {
+    var name = new URLSearchParams(location.search).get('name') || '';
+    var icon = decodeURIComponent(new URLSearchParams(location.search).get('icon') || '');
+    var path = decodeURIComponent(new URLSearchParams(location.search).get('path') || '');
+
+    document.getElementById('game-name').textContent = name;
+    var iconEl = document.getElementById('game-icon');
+    iconEl.src = icon && !icon.startsWith('http') ? '../' + icon : icon;
+
+    var c = window.SITE_CONFIG || {};
+    var host = c.domain ? new URL(c.domain).hostname : location.hostname;
+    document.title = name + ' | ' + (c.siteName || 'Game') + ' - ' + host;
+
+    var progress = document.getElementById('play-progress');
+    var playBtn = document.getElementById('play-btn');
+    var percent = 0;
+    var isReady = false;
+    var nextGameUrl = null;
+
+    var interval = setInterval(function() {
+      percent += 2;
+      progress.style.width = Math.min(percent, 100) + '%';
+      if (percent >= 100) {
+        clearInterval(interval);
+        progress.textContent = 'PLAY';
+        isReady = true;
+        playBtn.style.cursor = 'pointer';
+      }
+    }, 60);
+
+    var list = window.conf || [];
+    var others = list.filter(function(g) { return g.name !== name; });
+    if (others.length > 0) {
+      var pick = others[Math.floor(Math.random() * others.length)];
+      nextGameUrl = pick?.gameUrl ? 'https://games.nfiuh.top' + pick.gameUrl : null;
+    }
+
+    playBtn.addEventListener('click', function() {
+      if (!isReady) return;
+      var target = nextGameUrl || path;
+      if (!target) return;
+      var iframe = document.getElementById('play-frame');
+      iframe.src = target;
+      document.getElementById('play-section').style.height = '100vh';
+    });
+
+    function loadAdSense() {
+      var ins = document.createElement('ins');
+      ins.className = 'adsbygoogle';
+      ins.style.cssText = 'display:block;width:100%;min-height:200px';
+      ins.setAttribute('data-ad-client', 'ca-pub-6029055280319095');
+      ins.setAttribute('data-ad-slot', '23347122509/caaca.top_detail_multiple-size-1');
+      ins.setAttribute('data-ad-format', 'auto');
+      document.getElementById('ad-detail').appendChild(ins);
+      var s = document.createElement('script');
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+      s.async = true;
+      document.head.appendChild(s);
+    }
+
+    if (requestIdleCallback) {
+      requestIdleCallback(loadAdSense, {timeout: 2000});
+    } else {
+      setTimeout(loadAdSense, 100);
+    }
+  })();
+  </script>
+</body>
+</html>
