@@ -60,7 +60,6 @@
   </div>
 
   <script src="../config.js"></script>
-  <script src="script.js"></script>
   <script>
   (function() {
     var name = new URLSearchParams(location.search).get('name') || '';
@@ -92,12 +91,14 @@
       }
     }, 60);
 
-    var list = window.conf || [];
-    var others = list.filter(function(g) { return g.name !== name; });
-    if (others.length > 0) {
-      var pick = others[Math.floor(Math.random() * others.length)];
-      nextGameUrl = pick?.gameUrl ? 'https://games.nfiuh.top' + pick.gameUrl : null;
-    }
+    fetch('../games.json').then(function(r){ return r.json(); }).then(function(d){
+      var list = d.data && d.data.list ? d.data.list : [];
+      var others = list.filter(function(g) { return g.name !== name; });
+      if (others.length > 0) {
+        var pick = others[Math.floor(Math.random() * others.length)];
+        nextGameUrl = pick.gameUrl ? 'https://games.nfiuh.top' + pick.gameUrl : null;
+      }
+    }).catch(function(){});
 
     playBtn.addEventListener('click', function() {
       if (!isReady) return;
